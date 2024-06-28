@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gioco di Corsa Orizzontale</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            position: relative;
+        }
+
+        canvas {
+            border: 2px solid #fff;
+        }
+
+        .control-button {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #000;
+            cursor: pointer;
+        }
+
+        #buttonUp {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #buttonDown {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="buttonUp" class="control-button">Up</div>
+    <div id="buttonDown" class="control-button">Down</div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        let player = {
+            x: 50,
+            y: canvasHeight / 2 - 25,
+            width: 60,
+            height: 10,
+            color: 'blue',
+            speed: 50
+        };
+
+        let obstacles = [];
+        let obstacleSpeed = 10;
+        let gameOver = false;
+
+        function drawPlayer() {
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = 'red';
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+        }
+
+        function updateObstacles() {
+            obstacles.forEach(obstacle => {
+                obstacle.x -= obstacleSpeed;
+            });
+            obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0);
+        }
+
+        function createObstacle() {
+            const height = Math.random() * 100 + 20;
+            const y = Math.random() * (canvasHeight - height);
+            const width = 20;
+            const x = canvasWidth;
+            obstacles.push({ x, y, width, height });
+        }
+
+        function detectCollision() {
+            obstacles.forEach(obstacle => {
+                if (player.x < obstacle.x + obstacle.width &&
+                    player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height &&
+                    player.y + player.height > obstacle.y) {
+                    gameOver = true;
+                }
+            });
+        }
+
+        function gameLoop() {
+            if (gameOver) {
+                alert("Game Over!");
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            drawPlayer();
+            drawObstacles();
+            updateObstacles();
+            detectCollision();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function movePlayerUp() {
+            player.y -= player.speed;
+            if (player.y < 0) player.y = 0;
+        }
+
+        function movePlayerDown() {
+            player.y += player.speed;
+            if (player.y + player.height > canvasHeight) player.y = canvasHeight - player.height;
+        }
+
+        function movePlayer(event) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    movePlayerUp();
+                    break;
+                case 'ArrowDown':
+                    movePlayerDown();
+                    break;
+            }
+        }
+
+        document.addEventListener('keydown', movePlayer);
+        document.getElementById('buttonUp').addEventListener('click', movePlayerUp);
+        document.getElementById('buttonDown').addEventListener('click', movePlayerDown);
+
+        setInterval(createObstacle, 1000);  // Incrementa la frequenza di creazione degli ostacoli
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
+
