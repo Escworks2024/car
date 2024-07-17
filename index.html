@@ -39,13 +39,23 @@
 <body>
     <button id="startButton">START</button>
     <div id="countdown"></div>
-    <audio id="alertSound" src="https://www.myinstants.com/media/sounds/button-17.mp3"></audio>
 
     <script>
         const startButton = document.getElementById('startButton');
         const countdownDiv = document.getElementById('countdown');
-        const alertSound = document.getElementById('alertSound');
         let timer;
+
+        // Funzione per creare un suono con Web Audio API
+        function playSound() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sine'; // Tipo di onda sonora (puoi cambiare a 'square', 'sawtooth', 'triangle')
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // Frequenza in Hz
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), 500); // Suona per 500ms
+        }
 
         startButton.addEventListener('click', () => {
             if (timer) {
@@ -59,11 +69,8 @@
                 timeLeft--;
                 countdownDiv.textContent = timeLeft;
 
-                if (timeLeft <= 53 && timeLeft > 0) {
-                    alertSound.play();
-                } else if (timeLeft <= 0) {
-                    alertSound.pause();
-                    alertSound.currentTime = 0;
+                if (timeLeft <= 7 && timeLeft > 0) {
+                    playSound();
                 }
 
                 if (timeLeft <= 0) {
