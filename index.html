@@ -39,10 +39,12 @@
 <body>
     <button id="startButton">START</button>
     <div id="countdown"></div>
+    <audio id="alertSound" src="https://www.myinstants.com/media/sounds/button-17.mp3"></audio>
 
     <script>
         const startButton = document.getElementById('startButton');
         const countdownDiv = document.getElementById('countdown');
+        const alertSound = document.getElementById('alertSound');
         let timer;
 
         startButton.addEventListener('click', () => {
@@ -57,12 +59,11 @@
                 timeLeft--;
                 countdownDiv.textContent = timeLeft;
 
-                if (timeLeft <= 7) {
-                    if (navigator.vibrate) {
-                        navigator.vibrate(500); // Vibra per 500ms ogni secondo negli ultimi 7 secondi
-                    } else {
-                        console.log("Vibration API not supported");
-                    }
+                if (timeLeft <= 53 && timeLeft > 0) {
+                    alertSound.play();
+                } else if (timeLeft <= 0) {
+                    alertSound.pause();
+                    alertSound.currentTime = 0;
                 }
 
                 if (timeLeft <= 0) {
